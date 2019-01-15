@@ -49,7 +49,7 @@ def notears_simple(X: np.ndarray,
 
     def _visualize_func(w, title):
         # Visualize each coordinate in the weight matrix
-        eps = np.linspace(-.5, .5, 1e4)
+        eps = np.linspace(-.05, .05, 1e4)
         path = title + ".png"
         fig, axes = plt.subplots(d, d, sharey = True)
         w_shaped = w.reshape(d, d)
@@ -61,7 +61,7 @@ def notears_simple(X: np.ndarray,
                 for k in range(len(eps)):
                     w_prime = w_shaped.copy()
                     w_prime[i, j] += eps[k]
-                    ys[k] = _func(w_prime)
+                    ys[k] = min(_func(w_prime), 100)
                 axes[i, j].plot(xs, ys)
                 ys.dump(title + "_" + str(i) + "_" + str(j) + ".npy")
         fig.suptitle(title)
@@ -69,7 +69,7 @@ def notears_simple(X: np.ndarray,
 
     def _visualize_h(w, title):
         # Visualize each coordinate in the weight matrix
-        eps = np.linspace(-.5, .5, 1e4)
+        eps = np.linspace(-.05, .05, 1e4)
         path = title + ".png"
         fig, axes = plt.subplots(d, d, sharey = True)
         w_shaped = w.reshape(d, d)
@@ -81,7 +81,7 @@ def notears_simple(X: np.ndarray,
                 for k in range(len(eps)):
                     w_prime = w_shaped.copy()
                     w_prime[i, j] += eps[k]
-                    ys[k] = _func(w_prime)
+                    ys[k] = min(_h(w_prime), 100)
                 axes[i, j].plot(xs, ys)
         fig.suptitle(title)
         fig.savefig(path)
@@ -122,21 +122,25 @@ def notears_simple(X: np.ndarray,
     _visualize_h(w_est.reshape([d, d]), "Plot of constraint at final solution")
     _visualize_func(w_est.reshape([d, d]), "Plot of function at final solution")
     w_time_pc = pca_vis.fit_transform(w_time)
-    eps = np.linspace(-.5, .5, 1e4)
-    cons_along_pc = np.zeros((int(1e4), int(1e4)))
-    func_along_pc = np.zeros((int(1e4), int(1e4)))
+    eps = np.linspace(-.05, .05, 1e3)
+    cons_along_pc = np.zeros((int(1e3), int(1e3)))
+    func_along_pc = np.zeros((int(1e3), int(1e3)))
     for i in range(len(eps)):
         for j in range(len(eps)):
             w_temp = w_est.copy()
             w_temp += eps[i] * w_time_pc[:, 0]
             w_temp += eps[j] * w_time_pc[:, 1]
-            cons_along_pc[i, j] = _h(w_temp[:, np.newaxis])
-            func_along_pc[i, j] = _func(w_temp[:, np.newaxis])
+            cons_along_pc[i, j] = min(_h(w_temp[:, np.newaxis]), 100)
+            func_along_pc[i, j] = min(_func(w_temp[:, np.newaxis]), 100)
 
+    plt.cla()
+    np.save("t1.npy", cons_along_pc)
+    np.save("t2.npy", func_along_pc)
     X, Y = np.meshgrid(eps, eps)
-    Axes3D.plot_surface(X, Y, cons_along_pc)
+    # Axes3D.plot_surface(X, Y, cons_along_pc)
+
     plt.show()
-    Axes3D.plot_surface(X, Y, func_along_pc)
+    # Axes3D.plot_surface(X, Y, func_along_pc)
     plt.show()
     return w_est.reshape([d, d])
 
@@ -147,7 +151,7 @@ if __name__ == '__main__':
     import utils
 
     # configurations
-    n, d = 1000, 5
+    n, d = 1000, 5 
     graph_type, degree, sem_type = 'erdos-renyi', 4, 'linear-gauss'
     log.info('Graph: %d node, avg degree %d, %s graph', d, degree, graph_type)
     log.info('Data: %d samples, %s SEM', n, sem_type)
