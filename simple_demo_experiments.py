@@ -9,6 +9,8 @@ i.e. lambda = 0, hence it requires n >> d.
 import numpy as np
 import scipy.linalg as slin
 import scipy.optimize as sopt
+import glog as log
+
 from fast_expm import fast_expm
 
 
@@ -71,7 +73,6 @@ def notears_simple(X: np.ndarray,
 
 
 if __name__ == '__main__':
-    import glog as log
     import networkx as nx
     import utils
 
