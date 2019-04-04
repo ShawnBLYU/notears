@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# temporary data files
+*.npy
+
+# experimentation results
+experimentation_results/
