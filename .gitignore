@@ -105,3 +105,6 @@ venv.bak/
 
 # temporary data files
 *.npy
+
+# experimentation results
+experimentation_results/

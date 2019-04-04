@@ -11,7 +11,7 @@ import scipy.linalg as slin
 import scipy.optimize as sopt
 import glog as log
 
-from fast_expm import fast_expm
+from fast_expm import fast_expm, crit
 
 
 def notears_simple(X: np.ndarray,
@@ -35,6 +35,7 @@ def notears_simple(X: np.ndarray,
             return np.trace(fast_expm(W * W, prev_ww, prev_expm, debug=True)) - d
         else:
             return np.trace(slin.expm(W * W)) - d
+
     def _func(w):
         W = w.reshape([d, d])
         loss = 0.5 / n * np.square(np.linalg.norm(X.dot(np.eye(d, d) - W), 'fro'))
@@ -64,6 +65,17 @@ def notears_simple(X: np.ndarray,
                 rho *= 10
             else:
                 break
+
+        log.info("l2 norm of the change {}".format(np.linalg.norm(w_est - w_new)))
+        log.info("l infinity norm of the change {}".format(np.linalg.norm(w_est - w_new, ord=np.inf)))
+        log.info("The percentage of change wrt l2 norm {}".format(
+            np.linalg.norm(w_est - w_new) / np.linalg.norm(w_est)
+        ))
+        tmp1 = w_new.reshape([d, d])
+        tmp2 = w_est.reshape([d, d])
+        tmp1 = tmp1 * tmp1
+        tmp2 = tmp2 * tmp2
+        _ = fast_expm(tmp1, tmp2, slin.expm(tmp2), crit_norm='always_true')
         w_est, h = w_new, h_new
         alpha += rho * h
         if h <= h_tol:
@@ -77,7 +89,7 @@ if __name__ == '__main__':
     import utils
 
     # configurations
-    n, d = 1000, 10
+    n, d = 1000, 20
     graph_type, degree, sem_type = 'erdos-renyi', 4, 'linear-gauss'
     log.info('Graph: %d node, avg degree %d, %s graph', d, degree, graph_type)
     log.info('Data: %d samples, %s SEM', n, sem_type)
