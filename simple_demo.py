@@ -70,7 +70,7 @@ if __name__ == '__main__':
     import utils
 
     # configurations
-    n, d = 1000, 10
+    n, d = 1000, 20
     graph_type, degree, sem_type = 'erdos-renyi', 4, 'linear-gauss'
     log.info('Graph: %d node, avg degree %d, %s graph', d, degree, graph_type)
     log.info('Data: %d samples, %s SEM', n, sem_type)

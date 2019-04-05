@@ -75,7 +75,7 @@ def notears_simple(X: np.ndarray,
         tmp2 = w_est.reshape([d, d])
         tmp1 = tmp1 * tmp1
         tmp2 = tmp2 * tmp2
-        _ = fast_expm(tmp1, tmp2, slin.expm(tmp2), crit_norm='always_true')
+        _ = fast_expm(tmp1, tmp2, slin.expm(tmp2), crit_norm='always_true', num_terms=10)
         w_est, h = w_new, h_new
         alpha += rho * h
         if h <= h_tol:
