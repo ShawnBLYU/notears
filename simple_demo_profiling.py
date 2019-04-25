@@ -28,7 +28,7 @@ def notears_simple(X: np.ndarray,
         W_est: [d,d] estimate
     """
     def _h(w):
-    	start = time.time()
+        start = time.time()
         W = w.reshape([d, d])
         result = np.trace(slin.expm(W * W)) - d
         end = time.time()
@@ -36,7 +36,7 @@ def notears_simple(X: np.ndarray,
         return result
 
     def _func(w):
-    	start = time.time()
+        start = time.time()
         W = w.reshape([d, d])
         loss = 0.5 / n * np.square(np.linalg.norm(X.dot(np.eye(d, d) - W), 'fro'))
         h = _h(W)
@@ -46,7 +46,7 @@ def notears_simple(X: np.ndarray,
         return result
 
     def _grad(w):
-    	start = time.time()
+        start = time.time()
         W = w.reshape([d, d])
         loss_grad = - 1.0 / n * X.T.dot(X).dot(np.eye(d, d) - W)
         E = slin.expm(W * W)
