@@ -9,8 +9,10 @@ i.e. lambda = 0, hence it requires n >> d.
 import numpy as np
 import scipy.linalg as slin
 import scipy.optimize as sopt
-import time
 import glog as log
+
+from fast_expm_ver3 import fast_expm, crit
+
 
 def notears_simple(X: np.ndarray,
                    max_iter: int = 100,
@@ -27,41 +29,28 @@ def notears_simple(X: np.ndarray,
     Returns:
         W_est: [d,d] estimate
     """
-    def _h(w):
-        start = time.time()
+    def _h(w, prev_ww=None, prev_expm=None):
         W = w.reshape([d, d])
-        exp_start = time.time()
-        E = slin.expm(W * W)
-        exp_end = time.time()
-        log.info("Amount of time spent on expm for h is %f", exp_end - exp_start)
-        result = np.trace(slin.expm(W * W)) - d
-        end = time.time()
-        log.info('Amount of time spent on calculating h is %f', end - start)
-        return result
+        if prev_ww is not None and prev_expm is not None:
+            return np.trace(fast_expm(W * W, prev_ww, prev_expm, debug=True)) - d
+        else:
+            return np.trace(slin.expm(W * W)) - d
 
     def _func(w):
-        start = time.time()
         W = w.reshape([d, d])
         loss = 0.5 / n * np.square(np.linalg.norm(X.dot(np.eye(d, d) - W), 'fro'))
         h = _h(W)
-        result = loss + 0.5 * rho * h * h + alpha * h
-        end = time.time()
-        log.info('Amount of time spent on calculating objective function is %f', end - start)
-        return result
+        return loss + 0.5 * rho * h * h + alpha * h
 
-    def _grad(w):
-        start = time.time()
+    def _grad(w, prev_ww=None, prev_expm=None):
         W = w.reshape([d, d])
         loss_grad = - 1.0 / n * X.T.dot(X).dot(np.eye(d, d) - W)
-        exp_start = time.time()
-        E = slin.expm(W * W)
-        exp_end = time.time()
-        log.info("Amount of time spent on expm for gradient is %f", exp_end - exp_start)
+        if prev_ww is not None and prev_expm is not None:
+            E = fast_expm(W * W, prev_ww, prev_expm, debug=True)
+        else:
+            E = slin.expm(W * W)
         obj_grad = loss_grad + (rho * (np.trace(E) - d) + alpha) * E.T * W * 2
-        result = obj_grad.flatten()
-        end = time.time()
-        log.info('Amount of time spent on calculating gradient is %f', end - start)
-        return result
+        return obj_grad.flatten()
 
     n, d = X.shape
     w_est, w_new = np.zeros(d * d), np.zeros(d * d)
@@ -76,6 +65,17 @@ def notears_simple(X: np.ndarray,
                 rho *= 10
             else:
                 break
+
+        log.info("l2 norm of the change {}".format(np.linalg.norm(w_est - w_new)))
+        log.info("l infinity norm of the change {}".format(np.linalg.norm(w_est - w_new, ord=np.inf)))
+        log.info("The percentage of change wrt l2 norm {}".format(
+            np.linalg.norm(w_est - w_new) / np.linalg.norm(w_est)
+        ))
+        tmp1 = w_new.reshape([d, d])
+        tmp2 = w_est.reshape([d, d])
+        tmp1 = tmp1 * tmp1
+        tmp2 = tmp2 * tmp2
+        _ = fast_expm(tmp1, tmp2, slin.expm(tmp2), crit_norm='always_true', num_terms=10)
         w_est, h = w_new, h_new
         alpha += rho * h
         if h <= h_tol:
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     import utils
 
     # configurations
-    n, d = 1000, 1000
+    n, d = 1000, 20
     graph_type, degree, sem_type = 'erdos-renyi', 4, 'linear-gauss'
     log.info('Graph: %d node, avg degree %d, %s graph', d, degree, graph_type)
     log.info('Data: %d samples, %s SEM', n, sem_type)
