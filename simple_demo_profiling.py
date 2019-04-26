@@ -30,6 +30,10 @@ def notears_simple(X: np.ndarray,
     def _h(w):
         start = time.time()
         W = w.reshape([d, d])
+        exp_start = time.time()
+        E = slin.expm(W * W)
+        exp_end = time.time()
+        log.info("Amount of time spent on expm for h is %f", exp_end - exp_start)
         result = np.trace(slin.expm(W * W)) - d
         end = time.time()
         log.info('Amount of time spent on calculating h is %f', end - start)
@@ -49,7 +53,10 @@ def notears_simple(X: np.ndarray,
         start = time.time()
         W = w.reshape([d, d])
         loss_grad = - 1.0 / n * X.T.dot(X).dot(np.eye(d, d) - W)
+        exp_start = time.time()
         E = slin.expm(W * W)
+        exp_end = time.time()
+        log.info("Amount of time spent on expm for gradient is %f", exp_end - exp_start)
         obj_grad = loss_grad + (rho * (np.trace(E) - d) + alpha) * E.T * W * 2
         result = obj_grad.flatten()
         end = time.time()
@@ -82,7 +89,7 @@ if __name__ == '__main__':
     import utils
 
     # configurations
-    n, d = 1000, 20
+    n, d = 1000, 50
     graph_type, degree, sem_type = 'erdos-renyi', 4, 'linear-gauss'
     log.info('Graph: %d node, avg degree %d, %s graph', d, degree, graph_type)
     log.info('Data: %d samples, %s SEM', n, sem_type)
