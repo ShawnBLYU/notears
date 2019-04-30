@@ -30,37 +30,39 @@ def notears_simple(X: np.ndarray,
     def _h(w):
         start = time.time()
         W = w.reshape([d, d])
-        exp_start = time.time()
         E = slin.expm(W * W)
-        exp_end = time.time()
-        log.info("Amount of time spent on expm for h is %f", exp_end - exp_start)
         result = np.trace(slin.expm(W * W)) - d
         end = time.time()
-        log.info('Amount of time spent on calculating h is %f', end - start)
         return result
 
     def _func(w):
-        start = time.time()
         W = w.reshape([d, d])
+        start1 = time.time()
         loss = 0.5 / n * np.square(np.linalg.norm(X.dot(np.eye(d, d) - W), 'fro'))
+        end1 = time.time()
+        log.info("time1 = {}".format(end1 - start1))
+        start2 = time.time()
         h = _h(W)
+        end2 = time.time()
+        log.info("time2 = {}".format(end2 - start2))
         result = loss + 0.5 * rho * h * h + alpha * h
-        end = time.time()
-        log.info('Amount of time spent on calculating objective function is %f', end - start)
         return result
 
     def _grad(w):
-        start = time.time()
         W = w.reshape([d, d])
+        start1 = time.time()
         loss_grad = - 1.0 / n * X.T.dot(X).dot(np.eye(d, d) - W)
-        exp_start = time.time()
+        end1 = time.time()
+        log.info("time1 = {}".format(end1 - start1))
+
+        start2 = time.time()
         E = slin.expm(W * W)
-        exp_end = time.time()
-        log.info("Amount of time spent on expm for gradient is %f", exp_end - exp_start)
-        obj_grad = loss_grad + (rho * (np.trace(E) - d) + alpha) * E.T * W * 2
+        constraint_grad = (rho * (np.trace(E) - d) + alpha) * E.T * W * 2
+        end2 = time.time()
+        log.info("time2 = {}".format(end2 - start2))
+
+        obj_grad = loss_grad + constraint_grad
         result = obj_grad.flatten()
-        end = time.time()
-        log.info('Amount of time spent on calculating gradient is %f', end - start)
         return result
 
     n, d = X.shape
@@ -73,9 +75,12 @@ def notears_simple(X: np.ndarray,
             w_new = sol.x
             h_new = _h(w_new)
             if h_new > 0.25 * h:
-                rho *= 10
+                log.info("rejected")
+                rho *= 10 #REJECT
             else:
-                break
+                log.info("accpeted")
+                break #ACCEPT
+        log.info("change={}".format(np.linalg.norm(w_est - w_new))
         w_est, h = w_new, h_new
         alpha += rho * h
         if h <= h_tol:
@@ -89,8 +94,8 @@ if __name__ == '__main__':
     import utils
 
     # configurations
-    n, d = 1000, 1000
-    graph_type, degree, sem_type = 'erdos-renyi', 4, 'linear-gauss'
+    n, d = 1000, 40
+    graph_type, degree, sem_type = 'erdos-renyi', 2, 'linear-gauss'
     log.info('Graph: %d node, avg degree %d, %s graph', d, degree, graph_type)
     log.info('Data: %d samples, %s SEM', n, sem_type)
 
