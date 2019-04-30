@@ -78,9 +78,9 @@ def notears_simple(X: np.ndarray,
                 log.info("rejected")
                 rho *= 10 #REJECT
             else:
-                log.info("accpeted")
+                log.info("accepted")
                 break #ACCEPT
-        log.info("change={}".format(np.linalg.norm(w_est - w_new))
+        log.info("change = {}".format(np.linalg.norm(w_est - w_new)))
         w_est, h = w_new, h_new
         alpha += rho * h
         if h <= h_tol:
