@@ -31,6 +31,8 @@ time2_sum = 0
 time1_running_sum_list = []
 time2_running_sum_list = []
 w_change_list = []
+num_accept = 0
+num_reject = 0
     
 for i in results_list:
 
@@ -46,11 +48,28 @@ for i in results_list:
         time1_running_sum = 0
         time2_running_sum_list.append(time2_running_sum)
         time2_running_sum = 0
+        if i[0] == "accepted":
+            num_accept += 1
+        elif i[0] == "rejected":
+            num_reject += 1
     else:
         w_change_list.append(i[1])
 
-print(time1_running_sum_list)
-print(time2_running_sum_list)
-print(time1_sum)
-print(time2_sum)
-print(w_change_list)
+plt.plot(np.arange(len(time1_running_sum_list)), time1_running_sum_list, label='Time1')
+plt.plot(np.arange(len(time2_running_sum_list)), time2_running_sum_list, label='Time2')
+plt.legend()
+plt.xlabel("Number of Updates")
+plt.ylabel("Time (in seconds)")
+plt.savefig("time1_vs_time2.png")
+
+plt.clf()
+plt.cla()
+plt.plot(np.arange(len(w_change_list)), w_change_list)
+plt.xlabel("Number of Updates")
+plt.ylabel("L2 norm of change")
+plt.savefig("w_change.png")
+
+print("There are {} accepts and {} rejects".format(num_accept, num_reject))
+print("Proportion of accept is {}".format(num_accept/(num_accept + num_reject)))
+print("Total time1 = {}, total time2 = {}".format(time1_sum, time2_sum))
+print("Proportion of time2 is {}".format(time2_sum/(time1_sum + time2_sum)))
