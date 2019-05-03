@@ -35,8 +35,6 @@ num_accept = 0
 num_reject = 0
     
 for i in results_list:
-
-
     if i[0] == "time1":
         time1_running_sum += i[1]
         time1_sum += i[1]
@@ -60,6 +58,7 @@ plt.plot(np.arange(len(time2_running_sum_list)), time2_running_sum_list, label='
 plt.legend()
 plt.xlabel("Number of Updates")
 plt.ylabel("Time (in seconds)")
+plt.title("Time1 vs Time2")
 plt.savefig("time1_vs_time2.png")
 
 plt.clf()
@@ -67,6 +66,7 @@ plt.cla()
 plt.plot(np.arange(len(w_change_list)), w_change_list)
 plt.xlabel("Number of Updates")
 plt.ylabel("L2 norm of change")
+plt.title("Changes in W")
 plt.savefig("w_change.png")
 
 print("There are {} accepts and {} rejects".format(num_accept, num_reject))
