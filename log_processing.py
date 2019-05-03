@@ -26,6 +26,8 @@ with open(log_address, "r") as f:
 
 time1_running_sum = 0
 time2_running_sum = 0
+time1_accept_sum = 0
+time2_accept_sum = 0
 time1_sum = 0
 time2_sum = 0
 time1_running_sum_list = []
@@ -39,15 +41,19 @@ num_reject = 0
 for i in results_list:
     if i[0] == "time1":
         time1_running_sum += i[1]
+        time1_accept_sum += i[1]
         time1_sum += i[1]
     elif i[0] == "time2":
         time2_running_sum += i[1]
+        time2_accept_sum += i[1]
         time2_sum += i[1]
     elif i[0] == "accepted" or i[0] == "rejected":
 
         if i[0] == "accepted":
-            time1_accept_sum_list.append(time1_running_sum)
-            time2_accept_sum_list.append(time2_running_sum)
+            time1_accept_sum_list.append(time1_accept_sum)
+            time2_accept_sum_list.append(time2_accept_sum)
+            time1_accept_sum = 0
+            time2_accept_sum = 0
             num_accept += 1
         elif i[0] == "rejected":
             num_reject += 1
