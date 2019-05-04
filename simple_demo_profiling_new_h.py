@@ -13,6 +13,7 @@ import scipy.linalg as slin
 import scipy.optimize as sopt
 import time
 import glog as log
+import sys
 
     
 def notears_simple(X: np.ndarray,
@@ -68,7 +69,7 @@ def notears_simple(X: np.ndarray,
         return result
 
     n, d = X.shape
-    constraint_alpha = 0.01
+    constraint_alpha = sys.argv[2]
     w_est, w_new = np.zeros(d * d), np.zeros(d * d)
     rho, alpha, h, h_new = 1.0, 0.0, np.inf, np.inf
     bnds = [(0, 0) if i == j else (None, None) for i in range(d) for j in range(d)]
@@ -97,7 +98,7 @@ if __name__ == '__main__':
     import utils
 
     # configurations
-    n, d = 1000, 40
+    n, d = 1000, sys.argv[1]
     graph_type, degree, sem_type = 'erdos-renyi', 2, 'linear-gauss'
     log.info('Graph: %d node, avg degree %d, %s graph', d, degree, graph_type)
     log.info('Data: %d samples, %s SEM', n, sem_type)
