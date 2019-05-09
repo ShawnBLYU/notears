@@ -62,7 +62,7 @@ def notears_simple(X: np.ndarray,
         start2 = time.time()
         d_minus_one_power = np.linalg.matrix_power(np.eye(d, d) + constraint_alpha * W * W, d - 1)
         d_power = (np.eye(d, d) + constraint_alpha * W * W).dot(d_minus_one_power)
-        constraint_grad = (rho * (np.trace(d_power) - d) + alpha) * constraint_alpha * d * d_minus_one_power.T.dot(W) * 2
+        constraint_grad = (rho * (np.trace(d_power) - d) + alpha) * constraint_alpha * d * d_minus_one_power.T * W * 2
         end2 = time.time()
         log.info("time2 = {}".format(end2 - start2))
 

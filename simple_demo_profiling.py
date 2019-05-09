@@ -11,6 +11,7 @@ import scipy.linalg as slin
 import scipy.optimize as sopt
 import time
 import glog as log
+import sys
 
 def notears_simple(X: np.ndarray,
                    max_iter: int = 100,
@@ -94,7 +95,7 @@ if __name__ == '__main__':
     import utils
 
     # configurations
-    n, d = 1000, 40
+    n, d = 1000, int(sys.argv[1])
     graph_type, degree, sem_type = 'erdos-renyi', 2, 'linear-gauss'
     log.info('Graph: %d node, avg degree %d, %s graph', d, degree, graph_type)
     log.info('Data: %d samples, %s SEM', n, sem_type)
