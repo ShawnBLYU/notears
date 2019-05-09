@@ -34,7 +34,7 @@ def notears_simple(X: np.ndarray,
     def _h(w):
         start = time.time()
         W = w.reshape([d, d])
-        result = np.trace(np.linalg.matrix_power(np.eye(d) + constraint_alpha * W, d))
+        result = np.trace(np.linalg.matrix_power(np.eye(d, d) + constraint_alpha * W * W, d)) - d
         end = time.time()
         return result
 
@@ -58,9 +58,11 @@ def notears_simple(X: np.ndarray,
         end1 = time.time()
         log.info("time1 = {}".format(end1 - start1))
 
+        # eqn. (121) in the matrix cookbook: d tr(X^k) = k (X^{k - 1})^T
         start2 = time.time()
-        E = slin.expm(W * W)
-        constraint_grad = (rho * (np.trace(E) - d) + alpha) * E.T * W * 2
+        d_minus_one_power = np.linalg.matrix_power(np.eye(d, d) + constraint_alpha * W * W, d - 1)
+        d_power = (np.eye(d, d) + constraint_alpha * W * W).dot(d_minus_one_power)
+        constraint_grad = (rho * (np.trace(d_power) - d) + alpha) * constraint_alpha * d * d_minus_one_power.T.dot(W) * 2
         end2 = time.time()
         log.info("time2 = {}".format(end2 - start2))
 
@@ -69,7 +71,7 @@ def notears_simple(X: np.ndarray,
         return result
 
     n, d = X.shape
-    constraint_alpha = sys.argv[2]
+    constraint_alpha = 1 / d # Setting constraint alpha to 1/d according to the paper
     w_est, w_new = np.zeros(d * d), np.zeros(d * d)
     rho, alpha, h, h_new = 1.0, 0.0, np.inf, np.inf
     bnds = [(0, 0) if i == j else (None, None) for i in range(d) for j in range(d)]
@@ -98,7 +100,7 @@ if __name__ == '__main__':
     import utils
 
     # configurations
-    n, d = 1000, sys.argv[1]
+    n, d = 1000, int(sys.argv[1])
     graph_type, degree, sem_type = 'erdos-renyi', 2, 'linear-gauss'
     log.info('Graph: %d node, avg degree %d, %s graph', d, degree, graph_type)
     log.info('Data: %d samples, %s SEM', n, sem_type)
