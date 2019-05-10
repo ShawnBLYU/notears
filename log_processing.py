@@ -4,6 +4,7 @@ import sys
 import numpy as np
 
 log_address = sys.argv[1]
+experiment_name = log_address.split("/")[1].split(".")[0]
 keywords = ["time1", "time2", "accepted", "rejected", "change"]
 def process_numbers(l):
     return np.float(l.split(" = ")[-1])
@@ -72,7 +73,7 @@ plt.legend()
 plt.xlabel("Number of Updates")
 plt.ylabel("Time (in seconds)")
 plt.title("Time1 vs Time2")
-plt.savefig("time1_vs_time2.png")
+plt.savefig("plots/{}_time1_vs_time2.png".format(experiment_name))
 
 plt.clf()
 plt.cla()
@@ -80,7 +81,7 @@ plt.plot(np.arange(len(w_change_list)), w_change_list)
 plt.xlabel("Number of Accepted Updates")
 plt.ylabel("L2 norm of change")
 plt.title("Changes in W")
-plt.savefig("w_change.png")
+plt.savefig("plots/{}_w_change.png".format(experiment_name))
 
 plt.clf()
 plt.cla()
@@ -90,7 +91,7 @@ plt.legend()
 plt.xlabel("Number of Accepted Updates")
 plt.ylabel("Time (in seconds)")
 plt.title("Time1 vs Time2")
-plt.savefig("time1_vs_time2_accept.png")
+plt.savefig("plots/{}_time1_vs_time2_accept.png".format(experiment_name))
 
 print("There are {} accepts and {} rejects".format(num_accept, num_reject))
 print("Proportion of accept is {}".format(num_accept/(num_accept + num_reject)))
