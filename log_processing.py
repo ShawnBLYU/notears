@@ -5,11 +5,13 @@ import numpy as np
 
 log_address = sys.argv[1]
 experiment_name = log_address.split("/")[1].split(".")[0]
-keywords = ["time1", "time2", "accepted", "rejected", "change"]
+keywords = ["time1", "time2", "accepted", "rejected", "change", "rho", "alpha"]
 def process_numbers(l):
     return np.float(l.split(" = ")[-1])
 
 results_list = []
+alpha_list = []
+rho_list = []
 with open(log_address, "r") as f:
     num_accepts = 0
     num_rejects = 0
@@ -24,6 +26,10 @@ with open(log_address, "r") as f:
                 elif w == "rejected":
                     results_list.append((w, num_rejects))
                     num_rejects += 1
+                elif w == "rho":
+                    rho_list.append(process_numbers(l))
+                elif w == "alpha":
+                    alpha_list.append(process_numbers(l))
 
 time1_running_sum = 0
 time2_running_sum = 0
@@ -97,3 +103,5 @@ print("There are {} accepts and {} rejects".format(num_accept, num_reject))
 print("Proportion of accept is {}".format(num_accept/(num_accept + num_reject)))
 print("Total time1 = {}, total time2 = {}".format(time1_sum, time2_sum))
 print("Proportion of time2 is {}".format(time2_sum/(time1_sum + time2_sum)))
+print("The list of rhos is {}".format(rho_list))
+print("The list of alphas is {}".format(alpha_list))

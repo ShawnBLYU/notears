@@ -75,6 +75,8 @@ def notears_simple(X: np.ndarray,
             sol = sopt.minimize(_func, w_est, method='L-BFGS-B', jac=_grad, bounds=bnds)
             w_new = sol.x
             h_new = _h(w_new)
+            log.info("rho = {}".format(rho))
+            log.info("alpha = {}".format(alpha))
             if h_new > 0.25 * h:
                 log.info("rejected")
                 rho *= 10 #REJECT
@@ -107,7 +109,7 @@ if __name__ == '__main__':
 
     # data
     log.info('Simulating data ...')
-    X = utils.simulate_sem(G, n, sem_type)
+    X = utils.simulate_population_sample(nx.to_numpy_array(G), np.eye(d))
     log.info('Simulating data ... Done')
 
     # solve optimization problem

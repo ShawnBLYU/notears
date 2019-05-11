@@ -8,13 +8,17 @@ i.e. lambda = 0, hence it requires n >> d.
 
 Uses the alternative form for h for profiling
 """
+
+## ALSO PROFILE ALPHA RHO
+## Compare solution
+
 import numpy as np
 import scipy.linalg as slin
 import scipy.optimize as sopt
 import time
 import glog as log
 import sys
-
+import random
     
 def notears_simple(X: np.ndarray,
                    max_iter: int = 100,
@@ -80,6 +84,8 @@ def notears_simple(X: np.ndarray,
             sol = sopt.minimize(_func, w_est, method='L-BFGS-B', jac=_grad, bounds=bnds)
             w_new = sol.x
             h_new = _h(w_new)
+            log.info("rho = {}".format(rho))
+            log.info("alpha = {}".format(alpha))
             if h_new > 0.25 * h:
                 log.info("rejected")
                 rho *= 10 #REJECT
@@ -99,6 +105,9 @@ if __name__ == '__main__':
     import networkx as nx
     import utils
 
+    random.seed(0)
+    np.random.seed(0)
+
     # configurations
     n, d = 1000, int(sys.argv[1])
     graph_type, degree, sem_type = 'erdos-renyi', 2, 'linear-gauss'
@@ -112,7 +121,7 @@ if __name__ == '__main__':
 
     # data
     log.info('Simulating data ...')
-    X = utils.simulate_sem(G, n, sem_type)
+    X = utils.simulate_population_sample(nx.to_numpy_array(G), np.eye(d))
     log.info('Simulating data ... Done')
 
     # solve optimization problem
