@@ -9,7 +9,7 @@ import networkx as nx
 import random
 
 np.random.seed(0)
-random.set_seed(0)
+random.seed(0)
 
 def simulate_random_dag(d: int,
                         degree: int,
@@ -26,6 +26,8 @@ def simulate_random_dag(d: int,
     Returns:
         G: weighted DAG
     """
+    np.random.seed(0)
+    random.seed(0)
     if graph_type == 'erdos-renyi':
         prob = float(degree) / (d - 1)
         B = np.tril((np.random.rand(d, d) < prob).astype(float), k=-1)
@@ -68,6 +70,8 @@ def simulate_sem(G: nx.DiGraph,
     Returns:
         X: [n,d] sample matrix
     """
+    np.random.seed(0)
+    random.seed(0)
     W = nx.to_numpy_array(G)
     d = W.shape[0]
     X = np.zeros([n, d])
