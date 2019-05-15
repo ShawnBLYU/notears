@@ -72,7 +72,7 @@ for i in results_list:
     else:
         w_change_list.append(i[1])
 
-
+# Plotting time1 vs time2
 plt.plot(np.arange(len(time1_running_sum_list)), time1_running_sum_list, label='Time1')
 plt.plot(np.arange(len(time2_running_sum_list)), time2_running_sum_list, label='Time2')
 plt.legend()
@@ -81,6 +81,7 @@ plt.ylabel("Time (in seconds)")
 plt.title("Time1 vs Time2")
 plt.savefig("plots/{}_time1_vs_time2.png".format(experiment_name))
 
+# Plotting change magnitude
 plt.clf()
 plt.cla()
 plt.plot(np.arange(len(w_change_list)), w_change_list)
@@ -89,6 +90,7 @@ plt.ylabel("L2 norm of change")
 plt.title("Changes in W")
 plt.savefig("plots/{}_w_change.png".format(experiment_name))
 
+# Plotting time1 vs time2 in successful updates
 plt.clf()
 plt.cla()
 plt.plot(np.arange(len(time1_accept_sum_list)), time1_accept_sum_list, label='Time1')
@@ -98,6 +100,23 @@ plt.xlabel("Number of Accepted Updates")
 plt.ylabel("Time (in seconds)")
 plt.title("Time1 vs Time2")
 plt.savefig("plots/{}_time1_vs_time2_accept.png".format(experiment_name))
+
+# Plotting values of rho and alpha in all updates
+plt.clf()
+plt.cla()
+plt.plot(np.arange(len(rho_list)), rho_list)
+plt.xlabel("Number of All Updates")
+plt.ylabel("Value of Rho")
+plt.title("Change in Rho Across Updates")
+plt.savefig("plots/{}_rho.png".format(experiment_name))
+
+plt.clf()
+plt.cla()
+plt.plot(np.arange(len(alpha_list)), alpha_list)
+plt.xlabel("Number of All Updates")
+plt.ylabel("Value of Alpha")
+plt.title("Change in Alpha Across Updates")
+plt.savefig("plots/{}_alpha.png".format(experiment_name))
 
 print("There are {} accepts and {} rejects".format(num_accept, num_reject))
 print("Proportion of accept is {}".format(num_accept/(num_accept + num_reject)))
