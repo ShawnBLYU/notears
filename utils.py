@@ -6,7 +6,10 @@ Use W = nx.to_numpy_array(G) to convert directed graph to adj matrix.
 import numpy as np
 import scipy.linalg as slin
 import networkx as nx
+import random
 
+np.random.seed(0)
+random.set_seed(0)
 
 def simulate_random_dag(d: int,
                         degree: int,
